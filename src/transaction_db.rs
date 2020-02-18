@@ -549,7 +549,11 @@ impl<'a> IterateCF for Snapshot<'a> {
 }
 
 impl WriteOps for TransactionDB {
-    fn write_full(&self, batch: WriteBatch, writeopts: Option<&WriteOptions>) -> Result<(), Error> {
+    fn write_full(
+        &self,
+        batch: &WriteBatch,
+        writeopts: Option<&WriteOptions>,
+    ) -> Result<(), Error> {
         let mut default_writeopts = None;
 
         let wo_handle = WriteOptions::input_or_default(writeopts, &mut default_writeopts)?;

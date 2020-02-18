@@ -26,6 +26,7 @@ mod open;
 
 mod checkpoint;
 mod compact;
+mod delete_file_in_range;
 mod flush;
 mod iter;
 mod property;
@@ -54,6 +55,7 @@ pub use self::columnfamily::CreateCf;
 pub use self::columnfamily::DropCf;
 pub use self::columnfamily::GetColumnFamilys;
 pub use self::compact::{CompactRange, CompactRangeCF};
+pub use self::delete_file_in_range::{DeleteFileInRange, DeleteFileInRangeCF};
 pub use self::flush::Flush;
 pub use self::iter::{Iterate, IterateCF};
 pub use self::property::{GetProperty, GetPropertyCF};

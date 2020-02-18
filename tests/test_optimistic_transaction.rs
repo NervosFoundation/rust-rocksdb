@@ -2,7 +2,7 @@ extern crate ckb_rocksdb as rocksdb;
 
 use rocksdb::{
     prelude::*, MergeOperands, OptimisticTransaction, OptimisticTransactionDB,
-    OptimisticTransactionOptions, Options, TemporaryDBPath, WriteOptions,
+    OptimisticTransactionOptions, Options, TemporaryDBPath, WriteBatch, WriteOptions,
 };
 use std::sync::Arc;
 use std::thread;
@@ -14,6 +14,45 @@ fn test_optimistic_transactiondb() {
         let db = OptimisticTransactionDB::open_default(&n).unwrap();
         db.put(b"k1", b"v1").unwrap();
         assert_eq!(db.get(b"k1").unwrap().unwrap().as_ref(), b"v1");
+    }
+}
+
+#[test]
+fn write_batch_works() {
+    let path = TemporaryDBPath::new();
+    {
+        let db = OptimisticTransactionDB::open_default(&path).unwrap();
+        {
+            // test put
+            let mut batch = WriteBatch::default();
+            assert!(db.get(b"k1").unwrap().is_none());
+            assert_eq!(batch.len(), 0);
+            assert!(batch.is_empty());
+            let _ = batch.put(b"k1", b"v1111");
+            assert_eq!(batch.len(), 1);
+            assert!(!batch.is_empty());
+            assert!(db.get(b"k1").unwrap().is_none());
+            assert!(db.write(&batch).is_ok());
+            let r: Result<Option<DBVector>, Error> = db.get(b"k1");
+            assert!(r.unwrap().unwrap().to_utf8().unwrap() == "v1111");
+        }
+        {
+            // test delete
+            let mut batch = WriteBatch::default();
+            let _ = batch.delete(b"k1");
+            assert_eq!(batch.len(), 1);
+            assert!(!batch.is_empty());
+            assert!(db.write(&batch).is_ok());
+            assert!(db.get(b"k1").unwrap().is_none());
+        }
+        {
+            // test size_in_bytes
+            let mut batch = WriteBatch::default();
+            let before = batch.size_in_bytes();
+            let _ = batch.put(b"k1", b"v1234567890");
+            let after = batch.size_in_bytes();
+            assert!(before + 10 <= after);
+        }
     }
 }
 

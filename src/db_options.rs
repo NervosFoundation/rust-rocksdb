@@ -39,6 +39,7 @@ pub fn new_cache(capacity: size_t) -> *mut ffi::rocksdb_cache_t {
 pub struct ReadOptions {
     option_fill_cache: Option<bool>,
     option_set_iterate_upper_bound: Option<Vec<u8>>,
+    option_set_iterate_lower_bound: Option<Vec<u8>>,
     option_set_prefix_same_as_start: Option<bool>,
     option_set_total_order_seek: Option<bool>,
     option_set_readahead_size: Option<usize>,
@@ -81,6 +82,18 @@ impl ReadOptions {
     pub fn set_iterate_upper_bound<K: AsRef<[u8]>>(&mut self, key: K) {
         self.option_set_iterate_upper_bound = Some(key.as_ref().to_vec());
         let key = self.option_set_iterate_upper_bound.as_ref().unwrap();
+        unsafe {
+            ffi::rocksdb_readoptions_set_iterate_upper_bound(
+                self.inner,
+                key.as_ptr() as *const c_char,
+                key.len() as size_t,
+            );
+        }
+    }
+
+    pub fn set_iterate_lower_bound<K: AsRef<[u8]>>(&mut self, key: K) {
+        self.option_set_iterate_lower_bound = Some(key.as_ref().to_vec());
+        let key = self.option_set_iterate_lower_bound.as_ref().unwrap();
         unsafe {
             ffi::rocksdb_readoptions_set_iterate_upper_bound(
                 self.inner,
@@ -152,6 +165,7 @@ impl Default for ReadOptions {
             ReadOptions {
                 option_fill_cache: None,
                 option_set_iterate_upper_bound: None,
+                option_set_iterate_lower_bound: None,
                 option_set_prefix_same_as_start: None,
                 option_set_total_order_seek: None,
                 option_set_readahead_size: None,
@@ -169,6 +183,9 @@ impl Clone for ReadOptions {
         };
         if let Some(set_iterate_upper_bound) = &self.option_set_iterate_upper_bound {
             ops.set_iterate_upper_bound(set_iterate_upper_bound);
+        };
+        if let Some(set_iterate_lower_bound) = &self.option_set_iterate_lower_bound {
+            ops.set_iterate_lower_bound(set_iterate_lower_bound);
         };
         if let Some(set_prefix_same_as_start) = self.option_set_prefix_same_as_start {
             ops.set_prefix_same_as_start(set_prefix_same_as_start);

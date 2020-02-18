@@ -38,7 +38,7 @@ use libc::{c_char, size_t};
 /// batch.put(b"key2", b"value2");
 /// batch.put(b"key3", b"value3");
 ///
-/// db.write(batch); // Atomically commits the batch
+/// db.write(&batch); // Atomically commits the batch
 
 /// # }
 /// ```

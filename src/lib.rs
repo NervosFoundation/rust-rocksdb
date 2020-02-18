@@ -290,7 +290,7 @@ pub struct FlushOptions {
 ///     write_options.set_sync(false);
 ///     write_options.disable_wal(true);
 ///
-///     db.write_opt(batch, &write_options);
+///     db.write_opt(&batch, &write_options);
 /// }
 /// let _ = DB::destroy(&Options::default(), path);
 /// ```

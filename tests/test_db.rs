@@ -97,7 +97,7 @@ fn writebatch_works() {
             assert_eq!(batch.len(), 1);
             assert!(!batch.is_empty());
             assert!(db.get(b"k1").unwrap().is_none());
-            assert!(db.write(batch).is_ok());
+            assert!(db.write(&batch).is_ok());
             let r: Result<Option<DBVector>, Error> = db.get(b"k1");
             assert!(r.unwrap().unwrap().to_utf8().unwrap() == "v1111");
         }
@@ -107,7 +107,7 @@ fn writebatch_works() {
             let _ = batch.delete(b"k1");
             assert_eq!(batch.len(), 1);
             assert!(!batch.is_empty());
-            assert!(db.write(batch).is_ok());
+            assert!(db.write(&batch).is_ok());
             assert!(db.get(b"k1").unwrap().is_none());
         }
         {
