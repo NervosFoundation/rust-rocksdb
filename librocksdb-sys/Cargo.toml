@@ -8,6 +8,12 @@ description = "Native bindings to librocksdb"
 readme = "README.md"
 repository = "https://github.com/nervosnetwork/rust-rocksdb"
 keywords = [ "ffi", "rocksdb" ]
+exclude = [
+    ".gitignore",
+    "snappy/testdata",
+    "*/examples",
+    "*.md"
+]
 
 build = "build.rs"
 links = "rocksdb"
